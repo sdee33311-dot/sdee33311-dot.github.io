@@ -1,0 +1,40 @@
+name: Deploy MkDocs with Material Theme
+
+# main 브랜치에 푸시될 때 작동합니다 (프로젝트 설정에 맞게 브랜치명 수정 가능)
+on:
+  push:
+    branches:
+      - main
+
+# GitHub Pages 배포 권한 설정
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Python 설정
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      # 의존성 설치 (mkdocs-material 및 플러그인)
+      - name: Install dependencies
+        run: |
+          pip install mkdocs-material
+
+      # GitHub Actions 환경에서 원활한 배포를 위한 Git 설정
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+
+      # MkDocs 빌드 및 gh-pages 브랜치 자동 배포
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force
